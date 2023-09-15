@@ -10,21 +10,24 @@
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
             <form method="POST" action="/chamados/novo" enctype="multipart/form-data">
             @csrf
-              <div>
-                  <x-label for="title" value="titulo" />
-                  <input id="title" class="block mt-1 w-full" type="text" name="title"  />
+              
+              <div class="text-xl pt-4 ml-4 "> Titulo: 
+                <input id="title" class="form-control" type="text" name="title"  />
               </div>
 
-              <div>
-                <x-label for="description" value="descricao" />
-                <input id="description" class="block mt-1 w-full" type="text" name="description" />
-            </div>
+              <div class="text-xl pt-4 ml-4 "> Resumo: 
+                 <input id="description" class="form-control" type="text" name="description" />
+              </div>
 
-            <div>
-                <x-label for="attachment" value="anexo" />
-                <input id="attachment" class="block mt-1 w-full" type="text" name="attachment" />
-            </div>
-             <button type="submit" >Criar Chamado</button>
+              <div class="text-xl pt-4 ml-4 "> Anexo: 
+                <input id="attachment" class="form-control" type="text" name="attachment" />
+              </div>
+
+              <div class="text-xl pt-4 ml-4 mb-4">
+                <button type="submit" class="btn btn-outline-primary"  >Criar Chamado</button>
+              </div>
+              
+                 
 
              </form>
             </div>

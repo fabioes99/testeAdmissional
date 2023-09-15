@@ -9,24 +9,39 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
 
-            {{ $dadosChamado['id'].$dadosChamado['description'].$dadosChamado['attachment'] }}
-
+            <div class="text-xl pt-4 ml-4 "> Titulo: {{ $dadosChamado['id'] }}</div>
+            <div class="text-xl pt-4 ml-4 "> {{ $dadosChamado['description'] }}</div>
+            <div class="text-xl pt-4 ml-4 "> Anexo: {{ $dadosChamado['attachment'] }}</div>
+            <div class="text-xl pt-4 ml-4 "> Respostas:</div>
             @foreach($respostas as $key => $value)
-            <div>
-                  {{ $respostas[$key]['response'].$respostas[$key]['role'].$respostas[$key]['created_at'] }}
-              </div>
+            <div class="text-base pt-4 ml-4 ">
+                {{ $respostas[$key]['response'].'-'.$respostas[$key]['created_at'] }}
+            </div>
             <br>
             @endforeach
 
-            <form method="POST" action="/response/insert/{{ $dadosChamado['id'] }}" enctype="multipart/form-data">
-            @csrf
-                @if(auth()->user()->role === 'Colaborador')
-                    <input type="text" name="response" id="response"/>
-                    <button type="submit" >Responder o chamado</button>
-                @endif   
-             <button >Finalizar o chamado</button>
-
-             </form>
+            @if( $dadosChamado['status'] === 'Finalizado' )
+            <div class="ml-4 mr-4 mt-4 mb-4">
+                Chamado Finalizado!            
+            </div>
+            @else
+                <form method="POST" action="/response/insert/{{ $dadosChamado['id'] }}" enctype="multipart/form-data">
+                @csrf
+                    @if(auth()->user()->role === 'Colaborador')
+                        <div class="ml-4 mr-4 mt-4 mb-4">
+                            
+                            <input type="text" class="form-control" name="response" id="response" aria-describedby="response" placeholder="Escreva sua resposta">
+                            
+                        </div>
+                        <div class="ml-4 mr-4 mt-4 mb-4">
+                            <button type="submit" class="btn btn-outline-primary" >Responder o chamado</button>
+                        </div>
+                    @endif   
+                    <div class="ml-4 mr-4 mt-4 mb-4">
+                        <a href="{{ route('finalizar', ['id' => $dadosChamado['id'] ]) }}" class="btn btn-outline-warning">Finalizar Chamado</a>
+                    </div>
+                </form>
+            @endif
             </div>
         </div>
     </div>

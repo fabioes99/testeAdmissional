@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Chamado;
 use App\Models\ChamadoResposta;
+use Illuminate\Support\Carbon;
+
 
 class ChamadoController extends Controller
 {
@@ -57,8 +59,7 @@ class ChamadoController extends Controller
 
             return view('dashboard', ['chamados' => $chamados ]);
         } 
-      
-        
+         
     }
 
     public function response($id) {
@@ -67,32 +68,46 @@ class ChamadoController extends Controller
 
         $respostas = ChamadoResposta::where('chamado_id','=',$id)->get()->toArray();
 
+        foreach ($respostas as $key => $resposta) {
+            $respostas[$key]['created_at'] = Carbon::parse($resposta['created_at'])->format('d/m/Y H:i:s');
+        }
+
         if($chamado){
             return view('response', ['dadosChamado' => $chamado->getAttributes(), 'respostas' => $respostas]);
         }
       
     }
 
-    public function insertResponse(Request $request) {
-
+    public function insertResponse(Request $request, $id_chamado) {
         $user = Auth::user();
-
-       // Valide os dados do formulário
-       $validatedData = $request->validate([
-        'response' => 'required|string', 
+    
+        // Valide os dados do formulário
+        $validatedData = $request->validate([
+            'response' => 'required|string', 
         ]);
         
         $ChamadoResposta = new ChamadoResposta([
-            'chamado_id' => 1,
+            'chamado_id' => $id_chamado,
             'response' => $validatedData['response'],
         ]);
-
+    
         $user = Auth::user();
         $user->chamadoResposta()->save($ChamadoResposta);
-
+    
         return redirect()->route('dashboard')->with('success', 'Chamado respondido com sucesso.');
-      
     }
+
+
+    public function finalizar($id)
+    {
+        $chamado = Chamado::findOrFail($id);
+
+        $chamado->status = 'finalizado';
+        $chamado->save();
+
+        return redirect()->route('dashboard')->with('success', 'Chamado finalizado com sucesso.');
+    }
+    
 
 
 }

@@ -30,4 +30,6 @@ Route::middleware([
     Route::get('/dashboard', [ChamadoController::class, 'show'] )->name('dashboard');
     Route::get('/response/{id}', [ChamadoController::class, 'response'] )->name('response');
     Route::post('/response/insert/{id}', [ChamadoController::class, 'insertResponse'] )->name('insertResponse');
+    Route::get('/response/finalizar/{id}/', [ChamadoController::class, 'finalizar'])->name('finalizar');
+
 });
