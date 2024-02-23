@@ -18,7 +18,7 @@ return new class extends Migration
                 ->references('id')
                 ->on('chamados')
                 ->onDelete('cascade');
-            $table->string('response');
+            $table->text('response');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')
                 ->references('id')

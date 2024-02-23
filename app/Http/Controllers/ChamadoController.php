@@ -15,32 +15,47 @@ class ChamadoController extends Controller
 
     public function create()
     {
-        // Verifica se o usuário atual é do tipo "Cliente"
+        // Verifica se o usuï¿½rio atual ï¿½ do tipo "Cliente"
         $user = Auth::user();
         if ($user->role === 'Cliente') {
             return view('criar-chamado');
         } else {
             return redirect()->route('dashboard')->with('error', 'Somente clientes podem abrir chamados.');
-        } 
+        }
     }
 
     public function store(Request $request)
     {
-        // Valide os dados do formulário
+
+        // Valide os dados do formulï¿½rio
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
         ]);
-    
-        // Crie um novo chamado associado ao usuário atual
-        $chamado = new Chamado([
-            'title' => $validatedData['title'],
-            'description' => $validatedData['description'],
-            'attachment' => $request->attachment,
-            'status' => 'Aberto',
-        ]);
+
+        $chamado = new Chamado;
+
+        $chamado->title = $request->title;
+        $chamado->description = $request->description;
+        $chamado->status = 'Aberto';
+
+         // Image Upload
+         if($request->hasFile('attachment') && $request->file('attachment')->isValid()) {
+
+            $requestImage = $request->attachment;
+
+            $extension = $requestImage->extension();
+
+            $imageName = md5($requestImage->getClientOriginalName() . strtotime("now")) . "." . $extension;
+
+            $requestImage->move(public_path('storage'), $imageName);
+
+            $chamado->attachment = $imageName;
+
+        }
+
         $user = Auth::user();
-        
+
         $user->chamados()->save($chamado);
 
         return redirect()->route('dashboard')->with('success', 'Chamado aberto com sucesso.');
@@ -52,14 +67,14 @@ class ChamadoController extends Controller
 
         if ($user->role === 'Cliente') {
             $chamados = Chamado::where('user_id','=',$user->id)->get()->toArray();
-        
+
             return view('dashboard', ['chamados' => $chamados ]);
         } else {
             $chamados = Chamado::all();
 
             return view('dashboard', ['chamados' => $chamados ]);
-        } 
-         
+        }
+
     }
 
     public function response($id) {
@@ -75,25 +90,25 @@ class ChamadoController extends Controller
         if($chamado){
             return view('response', ['dadosChamado' => $chamado->getAttributes(), 'respostas' => $respostas]);
         }
-      
+
     }
 
     public function insertResponse(Request $request, $id_chamado) {
         $user = Auth::user();
-    
-        // Valide os dados do formulário
+
+        // Valide os dados do formulï¿½rio
         $validatedData = $request->validate([
-            'response' => 'required|string', 
+            'response' => 'required|string',
         ]);
-        
+
         $ChamadoResposta = new ChamadoResposta([
             'chamado_id' => $id_chamado,
             'response' => $validatedData['response'],
         ]);
-    
+
         $user = Auth::user();
         $user->chamadoResposta()->save($ChamadoResposta);
-    
+
         return redirect()->route('dashboard')->with('success', 'Chamado respondido com sucesso.');
     }
 
@@ -107,7 +122,7 @@ class ChamadoController extends Controller
 
         return redirect()->route('dashboard')->with('success', 'Chamado finalizado com sucesso.');
     }
-    
+
 
 
 }
